@@ -11,5 +11,7 @@ public interface ValidationService {
 
     boolean isPresence(Socks socks, Map<String, Socks> map);
 
-    boolean isStockAvailability(Socks socks, Map<String, Socks> map);
+
+
+    Map<String, Socks> checkComposition(Map<String, Socks> map);
 }

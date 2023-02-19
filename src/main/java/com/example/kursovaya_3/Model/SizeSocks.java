@@ -7,7 +7,7 @@ public enum SizeSocks {
     size29("Носки 29 размера"),
     size31("Носки 31 размера"),
     size33("Носки 33 размера");
-    String size;
+    private final String size;
 
     SizeSocks(String size) {
         this.size = size;

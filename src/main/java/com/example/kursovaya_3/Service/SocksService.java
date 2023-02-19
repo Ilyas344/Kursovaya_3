@@ -4,7 +4,9 @@ import com.example.kursovaya_3.Model.ColorSocks;
 import com.example.kursovaya_3.Model.SizeSocks;
 import com.example.kursovaya_3.Model.Socks;
 
+import java.io.File;
 import java.util.Map;
+import java.util.Optional;
 
 public interface SocksService {
 
@@ -14,7 +16,9 @@ public interface SocksService {
     Socks giveSocks(Socks socks);
 
 
-    public Map<String, Socks> getSocks();
+    Socks getSocks(ColorSocks colorSocks, SizeSocks sizeSocks, int minCotton, int maxCotton);
 
     Socks delete(Socks socks);
+
+    void saveSocksHistory(String text, Socks socks);
 }

@@ -1,14 +1,19 @@
 package com.example.kursovaya_3.Controller;
 
+import com.example.kursovaya_3.Model.ColorSocks;
+import com.example.kursovaya_3.Model.SizeSocks;
 import com.example.kursovaya_3.Model.Socks;
 import com.example.kursovaya_3.Service.SocksService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.BindException;
 import java.util.Map;
 
 
@@ -29,10 +34,12 @@ public class SocksController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Удалось добавить приход;"),
-            @ApiResponse(responseCode = "400", description = "параметры запроса отсутствуют или имеют некорректный формат;"),
-            @ApiResponse(responseCode = "500", description = "произошла ошибка, не зависящая от вызывающей стороны.")}
+            @ApiResponse(responseCode = "400", description = "параметры запроса отсутствуют или имеют некорректный формат;")}
     )
     public ResponseEntity<Object> add(@RequestBody Socks socks) {
+        if (socks.getQuantity() < 0) {
+            return ResponseEntity.badRequest().body("Нельзя добавить отрицательное кол-во носков");
+        }
         return ResponseEntity.ok(socksService.addSocks(socks));
     }
 
@@ -44,26 +51,25 @@ public class SocksController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Удалось произвести отпуск носков со склада;"),
             @ApiResponse(responseCode = "400", description = "товара нет на складе в нужном количестве или параметры запроса имеют некорректный формат;"),
-            @ApiResponse(responseCode = "500", description = "произошла ошибка, не зависящая от вызывающей стороны.")}
+    }
     )
     public ResponseEntity<Object> update(@RequestBody Socks socks) {
         if (socksService.giveSocks(socks).getQuantity() == 0) {
-            return ResponseEntity.badRequest().body(socks);
+            return ResponseEntity.badRequest().body("На складе нет нужного количества носков, выданы все что есть");
         }
         return ResponseEntity.ok(socks);
     }
 
     @GetMapping("/")
     @Operation(
-            summary = "Наличие всех носков на складе"
+            summary = "Выдача записи со склада"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Все носки выданы"),
-            @ApiResponse(responseCode = "400", description = "Есть ошибка в параметрах запроса"),
-            @ApiResponse(responseCode = "500", description = "Во время выполнения запроса произошла ошибка на сервере")}
+            @ApiResponse(responseCode = "200", description = "запись выдана")
+    }
     )
-    public ResponseEntity<Map<String, Socks>> getAll() {
-        return ResponseEntity.ok(socksService.getSocks());
+    public ResponseEntity<Socks> getAll (@RequestParam ColorSocks colorSocks, SizeSocks sizeSocks, int minCotton, int maxCotton) {
+        return ResponseEntity.ok(socksService.getSocks(colorSocks,sizeSocks,minCotton,maxCotton));
     }
 
     @DeleteMapping("/")
@@ -71,9 +77,8 @@ public class SocksController {
             summary = "Удаление записи со склада"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "запись удалена"),
-            @ApiResponse(responseCode = "400", description = "Есть ошибка в параметрах запроса"),
-            @ApiResponse(responseCode = "500", description = "Во время выполнения запроса произошла ошибка на сервере")}
+            @ApiResponse(responseCode = "200", description = "запись удалена")
+    }
     )
     public ResponseEntity<Socks> delete(@RequestBody Socks socks) {
         return ResponseEntity.ok(socksService.delete(socks));
